@@ -7,7 +7,7 @@ import convert from './internal/convert'
 import Exif from './internal/Metadata/Exif'
 import { StickerTypes } from './internal/Metadata/StickerTypes'
 import { Categories, extractMetadata } from '.'
-import { Color } from 'sharp'
+import { Color, WebpOptions } from 'sharp'
 
 /**
  * Sticker class
@@ -17,8 +17,9 @@ export class Sticker {
      * Sticker Constructor
      * @param {string|Buffer} [data] - File path, url or Buffer of the image/video to be converted
      * @param {IStickerOptions} [options] - Sticker options
+     * @param {WebpOptions} [webpConfig] - Webp custom config passed to sharp 
      */
-    constructor(private data: string | Buffer, public metadata: Partial<IStickerOptions> = {}) {
+    constructor(private data: string | Buffer, public metadata: Partial<IStickerOptions> = {}, private webpConfig?: WebpOptions) {
         this.metadata.author = this.metadata.author ?? ''
         this.metadata.pack = this.metadata.pack ?? ''
         this.metadata.id = this.metadata.id ?? Utils.generateStickerID()
@@ -58,7 +59,7 @@ export class Sticker {
     public build = async (): Promise<Buffer> => {
         const data = await this._parse()
         const mime = await this._getMimeType(data)
-        return new Exif(this.metadata as IStickerConfig).add(await convert(data, mime, this.metadata))
+        return new Exif(this.metadata as IStickerConfig).add(await convert(data, mime, this.metadata, this.webpConfig))
     }
 
     /**
