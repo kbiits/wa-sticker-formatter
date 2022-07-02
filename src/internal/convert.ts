@@ -10,7 +10,8 @@ import { IStickerOptions } from '..'
 const convert = async (
     data: Buffer,
     mime: string,
-    { quality = 100, background = defaultBg, type = StickerTypes.DEFAULT }: IStickerOptions
+    { quality = 100, background = defaultBg, type = StickerTypes.DEFAULT }: IStickerOptions,
+    webpConfig: Partial<sharp.WebpOptions> = {} 
 ): Promise<Buffer> => {
     const isVideo = mime.startsWith('video')
     let image = isVideo ? await videoToGif(data) : data
@@ -51,7 +52,8 @@ const convert = async (
     return await img
         .webp({
             quality,
-            lossless: false
+            lossless: false,
+            ...webpConfig,
         })
         .toBuffer()
 }
